@@ -1,15 +1,14 @@
-package com.example.demo.controller;
+package com.example.demo.controller.components;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 public class FilterBar extends HorizontalLayout {
 
     public TextField filterText = new TextField();
-    public Button addContactButton;
+    public Button filterContactButton;
 
     public FilterBar(){
         addClassName("toolbar");
@@ -18,8 +17,8 @@ public class FilterBar extends HorizontalLayout {
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
 
-        addContactButton = new Button("Add contact");
+        filterContactButton = new Button("Filter");
 
-        add(filterText, addContactButton);
+        add(filterText, filterContactButton);
     }
 }

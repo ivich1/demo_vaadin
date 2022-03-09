@@ -13,6 +13,4 @@ public interface SimpleRepository extends CrudRepository<SimpleEntity, Long> {
             "where lower(c.name) like lower(concat('%', :searchTerm, '%')) " +
             "or lower(c.surname) like lower(concat('%', :searchTerm, '%'))")
     List<SimpleEntity> findByFilter(@Param("searchTerm") String searchTerm);
-
-
 }
