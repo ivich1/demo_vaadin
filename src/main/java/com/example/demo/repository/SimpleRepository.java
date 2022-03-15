@@ -1,6 +1,6 @@
 package com.example.demo.repository;
 
-import com.example.demo.Entity.SimpleEntity;
+import com.example.demo.entity.SimpleEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

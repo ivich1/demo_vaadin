@@ -8,7 +8,7 @@ public class SimpleGrid<T> extends Grid<T> {
         super(beanType);
         addClassName("simple-grid");
         setSizeFull();
-        setColumns("id", "name", "surname", "email", "number");
+        setColumns("id", "name", "surname", "number", "salary", "hiringDate");
         getColumns().forEach(col -> col.setAutoWidth(true));
     }
 }

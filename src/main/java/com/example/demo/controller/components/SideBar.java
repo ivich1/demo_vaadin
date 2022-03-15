@@ -3,7 +3,7 @@ package com.example.demo.controller.components;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.button.Button;
 
@@ -15,8 +15,9 @@ public class SideBar extends FormLayout {
 
     public TextField name = new  TextField("name");
     public TextField surname = new TextField("surname");
-    public EmailField email = new EmailField("email");
     public TextField number = new TextField("number");
+    public NumberField salary = new NumberField("salary");
+    public TextField hiringDate = new TextField("date y-m-d");
 
     public Button add = new Button("Add");
     public Button change = new Button("Change");
@@ -36,8 +37,9 @@ public class SideBar extends FormLayout {
                 idFindBar,
                 name,
                 surname,
-                email,
                 number,
+                salary,
+                hiringDate,
                 buttonBar
         );
         setWidth("25em");

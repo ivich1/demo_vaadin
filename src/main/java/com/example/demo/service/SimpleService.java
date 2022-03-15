@@ -1,10 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.Entity.SimpleEntity;
+import com.example.demo.view.SimpleView;
+import com.example.demo.entity.SimpleEntity;
 import com.example.demo.repository.SimpleRepository;
+import com.example.demo.view.SimpleView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,11 +21,11 @@ public class SimpleService {
         this.simpleRepository = simpleRepository;
     }
 
-    public List<SimpleEntity> findAll(String filter){
+    public List<SimpleView> findAll(String filter){
         if(filter == null || filter.isEmpty()){
-            return (List<SimpleEntity>) simpleRepository.findAll();
+            return SimpleView.toSimpleView(simpleRepository.findAll());
         } else {
-            return simpleRepository.findByFilter(filter);
+            return SimpleView.toSimpleView(simpleRepository.findByFilter(filter));
         }
     }
 
@@ -45,20 +48,20 @@ public class SimpleService {
         simpleRepository.save(entity);
     }
 
-    public void change(String id, SimpleEntity entity) {
-        boolean conditionEntityNotNull = entity == null;
-        boolean conditionIdIsCorrect = id == null || id.isEmpty();
-        if(conditionEntityNotNull ||conditionIdIsCorrect){
-            System.err.println("something went wrong");
-            return;
-        }
-        entity.setId(Long.getLong(id));
-        simpleRepository.save(entity);
+    public void change(Long id, SimpleEntity entity) {
+        SimpleEntity toSave = simpleRepository.findById(id).orElseThrow();
+
+        toSave.setName(entity.getName());
+        toSave.setSurname(entity.getSurname());
+        toSave.setNumber(entity.getNumber());
+        toSave.setSalary(entity.getSalary());
+        toSave.setHiringDate(entity.getHiringDate());
+
+        simpleRepository.save(toSave);
     }
 
     public SimpleEntity fillById(Long id){
         Optional<SimpleEntity> optionalSimpleEntity = simpleRepository.findById(id);
         return optionalSimpleEntity.orElse(null);
-        //добавить нотификацию, позже
     }
 }

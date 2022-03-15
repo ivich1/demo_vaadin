@@ -1,24 +1,28 @@
 package com.example.demo.controller;
 
-import com.example.demo.Entity.SimpleEntity;
+import com.example.demo.entity.SimpleEntity;
 import com.example.demo.controller.components.FilterBar;
 import com.example.demo.controller.components.SideBar;
 import com.example.demo.controller.components.SimpleGrid;
 import com.example.demo.service.SimpleService;
+import com.example.demo.view.SimpleView;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import javax.annotation.security.PermitAll;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
-@PermitAll
+
 @Route(value = "")
 @PageTitle("Table")
 public class MainTable extends VerticalLayout {
 
     FilterBar filterBar = new FilterBar();
-    SimpleGrid<SimpleEntity> grid = new SimpleGrid<SimpleEntity>(SimpleEntity.class);
+    SimpleGrid<SimpleView> grid = new SimpleGrid<SimpleView>(SimpleView.class);
     SideBar sideBar = new SideBar();
     SimpleService service;
 
@@ -50,40 +54,33 @@ public class MainTable extends VerticalLayout {
         grid.setItems(service.findAll(filterBar.filterText.getValue()));
     }
 
-        private SimpleEntity takeInfo(){
+    private SimpleEntity takeInfo(){
         String name = sideBar.name.getValue();
         String surname = sideBar.surname.getValue();
-        String email = sideBar.email.getValue();
         int number = Integer.parseInt(sideBar.number.getValue());
-        return new SimpleEntity(name,surname,email,number);
+        double salary = sideBar.salary.getValue();
+        String stringDate = sideBar.hiringDate.getValue();
+
+        //с датой совсем все плохо
+        Calendar date = stringToCalendar(stringDate);
+
+        return new SimpleEntity(name, surname, number, salary, date);
     }
 
     private void change(){
         SimpleEntity tmp = takeInfo();
-        tmp.setId(Long.getLong(sideBar.id.getValue()));
-        service.change(sideBar.id.getValue() ,tmp);
+        Long id = Long.parseLong(sideBar.id.getValue());
+        Calendar date = stringToCalendar(sideBar.hiringDate.getValue());
+        service.change(id, tmp);
     }
+
     private void delete(){
         Long tmp = Long.parseLong(sideBar.id.getValue());
         service.delete(tmp);
     }
 
     private void save(){
-        //SimpleEntity tmp = takeInfo();
-        String name = sideBar.name.getValue();
-        String surname = sideBar.surname.getValue();
-        String email = sideBar.email.getValue();
-        int number = Integer.parseInt(sideBar.number.getValue());
-        SimpleEntity tmp = new SimpleEntity(name,surname,email,number);
-        service.save(tmp);
-    }
-
-    private void takeInfoToSave(){
-        String name = sideBar.name.getValue();
-        String surname = sideBar.surname.getValue();
-        String email = sideBar.email.getValue();
-        int number = Integer.parseInt(sideBar.number.getValue());
-        SimpleEntity tmp = new SimpleEntity(name,surname,email,number);
+        SimpleEntity tmp = takeInfo();
         service.save(tmp);
     }
 
@@ -93,8 +90,27 @@ public class MainTable extends VerticalLayout {
 
         sideBar.name.setValue(simpleEntity.getName());
         sideBar.surname.setValue(simpleEntity.getSurname());
-        sideBar.email.setValue(simpleEntity.getEmail());
         sideBar.number.setValue(Integer.toString(simpleEntity.getNumber()));
+        sideBar.salary.setValue(simpleEntity.getSalary());
+        sideBar.hiringDate.setValue(calendarToString(simpleEntity.getHiringDate()));
+    }
+
+    private String calendarToString(Calendar calendar){
+        var d = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+        var m = Integer.toString(calendar.get(Calendar.MONTH));
+        var y = Integer.toString(calendar.get(Calendar.YEAR));
+
+        return d + "-" + m + "-" + y;
+    }
+
+    private Calendar stringToCalendar(String stringDate){
+        int[] tmp = new int[3];
+        int i = 0;
+        for(String unit : stringDate.split("-", 3)){
+            tmp[i] = Integer.parseInt(unit);
+            i++;
+        }
+        return new GregorianCalendar(tmp[0],tmp[1],tmp[2]);
     }
 
 }
