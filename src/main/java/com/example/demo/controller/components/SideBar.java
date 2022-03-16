@@ -17,7 +17,7 @@ public class SideBar extends FormLayout {
     public TextField surname = new TextField("surname");
     public TextField number = new TextField("number");
     public NumberField salary = new NumberField("salary");
-    public TextField hiringDate = new TextField("date y-m-d");
+    public TextField hiringDate = new TextField("date d-m-y");
 
     public Button add = new Button("Add");
     public Button change = new Button("Change");

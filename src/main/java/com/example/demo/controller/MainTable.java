@@ -4,44 +4,58 @@ import com.example.demo.entity.SimpleEntity;
 import com.example.demo.controller.components.FilterBar;
 import com.example.demo.controller.components.SideBar;
 import com.example.demo.controller.components.SimpleGrid;
+import com.example.demo.service.SecurityService;
 import com.example.demo.service.SimpleService;
 import com.example.demo.view.SimpleView;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import java.text.SimpleDateFormat;
+import javax.annotation.security.PermitAll;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
-
+@PermitAll
 @Route(value = "")
 @PageTitle("Table")
 public class MainTable extends VerticalLayout {
 
-    FilterBar filterBar = new FilterBar();
-    SimpleGrid<SimpleView> grid = new SimpleGrid<SimpleView>(SimpleView.class);
-    SideBar sideBar = new SideBar();
     SimpleService service;
+    SecurityService securityService;
+
+    FilterBar filterBar = new FilterBar();
+    SimpleGrid<SimpleView> grid = new SimpleGrid(SimpleView.class);
+    SideBar sideBar = new SideBar();
+    Button loginButton;
+    Button fillButton;
 
     MainTable(SimpleService service){
         this.service = service;
         addClassName("main-table");
         setSizeFull();
+        securityService = new SecurityService();
+
+        loginButton = new Button("log out",e -> securityService.logout());
+        fillButton = new Button("add 3 entities", e -> fillTable());//просто кнопка ,чтобы заполнить таблицу
+        HorizontalLayout header = new HorizontalLayout(loginButton, fillButton);
+        header.addClassName("header");
+
 
         filterBar.filterText.addValueChangeListener(event -> updateList());
         sideBar.add.addClickListener(event -> save());
         sideBar.idInput.addClickListener(event -> getEntityToBar());
-        sideBar.delete.addClickListener(event ->delete() );
+        sideBar.delete.addClickListener(event -> delete() );
         sideBar.change.addClickListener(event -> change());
 
         HorizontalLayout tmpLayout = new HorizontalLayout(grid, sideBar);
+        grid.asSingleSelect().addValueChangeListener( e -> getEntityToBar(e.getValue()));
         tmpLayout.addClassName("tmp-layout");
         tmpLayout.setSizeFull();
 
         add(
+                header,
                 filterBar,
                 tmpLayout
         );
@@ -49,7 +63,7 @@ public class MainTable extends VerticalLayout {
 
     }
 
-    //не знаю, как отделить привязку функионала от отображения, оставлю тут
+    //не знаю, как привильно, оставлю тут
     private void updateList() {
         grid.setItems(service.findAll(filterBar.filterText.getValue()));
     }
@@ -70,18 +84,21 @@ public class MainTable extends VerticalLayout {
     private void change(){
         SimpleEntity tmp = takeInfo();
         Long id = Long.parseLong(sideBar.id.getValue());
-        Calendar date = stringToCalendar(sideBar.hiringDate.getValue());
         service.change(id, tmp);
+        updateList();
     }
 
     private void delete(){
         Long tmp = Long.parseLong(sideBar.id.getValue());
         service.delete(tmp);
+        updateList();
+
     }
 
     private void save(){
         SimpleEntity tmp = takeInfo();
         service.save(tmp);
+        updateList();
     }
 
     private void getEntityToBar(){
@@ -93,6 +110,24 @@ public class MainTable extends VerticalLayout {
         sideBar.number.setValue(Integer.toString(simpleEntity.getNumber()));
         sideBar.salary.setValue(simpleEntity.getSalary());
         sideBar.hiringDate.setValue(calendarToString(simpleEntity.getHiringDate()));
+    }
+    private void getEntityToBar(SimpleView simpleEntity){
+        sideBar.id.setValue((simpleEntity.getId()).toString());
+        sideBar.name.setValue(simpleEntity.getName());
+        sideBar.surname.setValue(simpleEntity.getSurname());
+        sideBar.number.setValue(Integer.toString(simpleEntity.getNumber()));
+        sideBar.salary.setValue(simpleEntity.getSalary());
+        sideBar.hiringDate.setValue(simpleEntity.getHiringDate());
+
+    }
+
+    private void fillTable(){
+        service.fillTable();
+        updateList();
+    }
+
+    private void selectEntity( SimpleEntity entity){
+
     }
 
     private String calendarToString(Calendar calendar){
@@ -110,7 +145,7 @@ public class MainTable extends VerticalLayout {
             tmp[i] = Integer.parseInt(unit);
             i++;
         }
-        return new GregorianCalendar(tmp[0],tmp[1],tmp[2]);
+        return new GregorianCalendar(tmp[2],tmp[1],tmp[1]);
     }
 
 }
